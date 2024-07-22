@@ -6,15 +6,15 @@ import {useMutation, useQueryClient, useSuspenseQueries} from "@tanstack/react-q
 import {Button} from "@/components/ui/button";
 import {useRouter} from "next/navigation";
 import {Textarea} from "@/components/ui/textarea";
-import {useState} from "react";
+import {AwaitedReactNode, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useState} from "react";
 import {Input} from "@/components/ui/input";
 
-export default function Component({params}: { params: { id: number }}) {
+export default function Component({params}: { params: { id: number } }) {
     const boardId = params.id;
     const router = useRouter()
 
     // 실제 구현해야 하는 데이터 부분
-    const getPostData = (boardId : number) => ({
+    const getPostData = (boardId: number) => ({
         title: "hello",
         nickname: "허경영",
         createdAt: "2023-12-12",
@@ -22,7 +22,7 @@ export default function Component({params}: { params: { id: number }}) {
     });
 
     // 실제 구현해야 하는 데이터 부분
-    const getCommentList = (boardId : number) => [
+    const getCommentList = (boardId: number) => [
         {
             title: "hello",
             nickname: "허경영",
@@ -49,7 +49,6 @@ export default function Component({params}: { params: { id: number }}) {
     };
 
 
-
     const results = useSuspenseQueries({
         queries: [
             {
@@ -66,7 +65,7 @@ export default function Component({params}: { params: { id: number }}) {
     const [post, comments] = results.map((result: { data: any; }) => result.data);
 
     const handleEdit = () => router.push(`/modify/${boardId}`);
-    const handleDelete =  () => null;
+    const handleDelete = () => null;
     const handleBack = () => router.push("/");
 
     const [newContents, setNewContents] = useState("");
@@ -76,10 +75,10 @@ export default function Component({params}: { params: { id: number }}) {
 
     // 실제로 구현해야 하는 파트
     // 실제 댓글 API 파트
-    const writeComment =  (param:any) => (param);
+    const writeComment = (param: any) => (param);
 
-    const {mutate:CommentAdd} = useMutation({
-        mutationFn: (param:Object) => writeComment(param),
+    const {mutate: CommentAdd} = useMutation({
+        mutationFn: (param: Object) => writeComment(param),
         onSuccess: (data, variables, context) => {
             queryClient.invalidateQueries({queryKey: ['commentList', boardId]})
             setNewContents('');
@@ -136,7 +135,11 @@ export default function Component({params}: { params: { id: number }}) {
                 <div className="mt-8 space-y-4">
                     <h2 className="text-2xl font-bold">Comments</h2>
                     <div className="space-y-4">
-                        {comments.map(comment => (
+                        {comments.map((comment: {
+                            id: Key | null | undefined;
+                            nickname: string | null | undefined;
+                            content: string | null | undefined;
+                            createdAt: string | null | undefined; }) => (
                             <div key={comment.id} className="flex items-start gap-4">
                                 <Avatar>
                                     <AvatarImage src="/placeholder-user.jpg"/>
@@ -146,7 +149,7 @@ export default function Component({params}: { params: { id: number }}) {
                                     <div className="flex items-center justify-between">
                                         <div className="font-medium">{comment.nickname}</div>
                                         <div
-                                            className="text-xs text-muted-foreground">{new Date(comment.createdAt).toLocaleDateString()}</div>
+                                            className="text-xs text-muted-foreground">{comment.createdAt}</div>
                                     </div>
                                     <p>{comment.content}</p>
                                 </div>
