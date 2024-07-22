@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext } from "@/components/ui/pagination"
+import { Board } from "@/types/Board"
 
 import { siteConfig } from "@/config/site"
 import { cn } from "@/lib/utils"
@@ -14,11 +15,11 @@ type Post = {
   nickname: string;
 };
 
-const posts: Post[] = [
-  { title: "Minimalist Post", description: "A simple and elegant post for your feed." },
-  { title: "Lifestyle Post", description: "Capture your daily moments with this post." },
-  { title: "Creative Post", description: "Unleash your creativity with this visually stunning post." },
+const posts: Board[] = [
+  {title: "1", content: 'qwer', nickname: '123', boardId:1},
+  {title: "2", content: 'qwer', nickname: '123', boardId:2},
 ];
+
 
 export default function Home() {
   return (
@@ -35,14 +36,14 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-1 gap-6 py-12 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 lg:gap-8">
             <div className="grid grid-cols-1 gap-6 py-12 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 lg:gap-8">
-            {posts.map((post, index) => (
-              <div key={index} className="group relative rounded-lg shadow-md">
+            {posts.map((post) => (
+              <div key={post.boardId} className="group relative rounded-lg shadow-md">
                 <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
                   <span className="sr-only">View Post</span>
                 </Link>
                 <div className="space-y-2 p-4">
                   <h3 className="text-lg font-semibold">{post.title}</h3>
-                  <p className="text-muted-foreground">{post.description}</p>
+                  <p className="text-muted-foreground">{post.nickname}</p>
                 </div>
               </div>
             ))}

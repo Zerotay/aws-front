@@ -10,6 +10,7 @@ import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from "axios";
 
+const API_URL = process.env.BACKEND_URL;
 
 // export default function Component() 
 export default function InputForm(
@@ -27,18 +28,17 @@ export default function InputForm(
 
 // 데이터 ceraet하기 함수
 const createPost = async (createdPost:any) => {
-  const response = await axios.put(`board/${createdPost.id}`, createdPost);
+  const response = await axios.post(`/board`, createdPost);
   return response.data;
 };
 // 게시판 수정 페이지 컴포넌트
-const EditPostPage = ({ postId }:any) => {
   const queryClient = useQueryClient();
 
 
     const { mutate} = useMutation({
     mutationFn: (param: any) => createPost(param),
     onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries({ queryKey: [postId] });
+      queryClient.invalidateQueries({ queryKey: [data.id] });
       // queryClient.invalidateQueries({ queryKey: ["articleList"] });
       router.push(`/detail/${data.id}`);
     },
@@ -52,7 +52,6 @@ const EditPostPage = ({ postId }:any) => {
   const handleSubmit = (event:any) => {
     event.preventDefault();
     const createdPost = {
-      id: postId,
       nickname: nickname,
       password: password,
       title: title,
@@ -69,7 +68,7 @@ const EditPostPage = ({ postId }:any) => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="title">제목 *</Label>
+            <Label htmlFor="title">제목</Label>
             <Input id="title" type="text" placeholder="제목을 입력하세요" defaultValue={title} required />
           </div>
           <div className="space-y-2">
@@ -101,5 +100,4 @@ const EditPostPage = ({ postId }:any) => {
       </Card>
     </div>
   )
-}
 }
