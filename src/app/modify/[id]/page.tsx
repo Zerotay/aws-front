@@ -9,7 +9,7 @@ import { Board } from "@/types/Board"
 import { updateBoard } from "@/lib/api"
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
+import axios from "axios";
 
 
 // export default function Component() 
@@ -25,13 +25,59 @@ export default function InputForm({
 
 
   const router = useRouter();
-  const handleSubmit = () =>{
-
-    updateBoard();
-  }
+  // const handleSubmit = () =>{
+  //   updateBoard();
+  // }
   const handleCancel = () =>{
     router.back();
   }
+  // 데이터 가져오기 함수
+const fetchPost = async (postId:number) => {
+  const response = await axios.get(`/board/${postId}`);
+  return response.data;
+};
+
+// 데이터 수정하기 함수
+const updatePost = async (updatedPost:any) => {
+  const response = await axios.put(`board/${updatedPost.id}`, updatedPost);
+  return response.data;
+};
+// 게시판 수정 페이지 컴포넌트
+const EditPostPage = ({ postId }:any) => {
+  const queryClient = useQueryClient();
+
+  // 데이터 쿼리 (Suspense 활성화)
+  const {data} = useQuery({
+    queryKey: [postId],
+    queryFn: context =>  fetchPost(params.id),
+  })
+
+    const { mutate} = useMutation({
+    mutationFn: (param: any) => updatePost(param),
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries({ queryKey: [postId] });
+      // queryClient.invalidateQueries({ queryKey: ["articleList"] });
+      router.push(`/detail/${params.id}`);
+    },
+    onError: (data, variables, context) => {
+      console.log(data);
+
+    },
+  });
+
+  // 폼 제출 핸들러
+  const handleSubmit = (event:any) => {
+    event.preventDefault();
+    const updatedPost = {
+      id: postId,
+      nickname: nickname,
+      password: password,
+      title: title,
+      content: content
+    };
+    mutate(updatedPost);
+    // mutation.mutate(updatedPost);
+  };
 
   return (
     <div className="flex justify-center">
@@ -74,5 +120,4 @@ export default function InputForm({
     </div>
   )
 }
-
-
+}
