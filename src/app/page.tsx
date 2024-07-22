@@ -8,8 +8,10 @@ import { Icons } from "@/components/icons"
 import { ModeToggle } from "@/components/mode-toggle"
 
 type Post = {
+  postId: number;
   title: string;
-  description: string;
+  content: string;
+  nickname: string;
 };
 
 const posts: Post[] = [
