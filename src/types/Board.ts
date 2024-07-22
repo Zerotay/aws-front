@@ -3,4 +3,5 @@ export type Board = {
   title: string;
   content: string;
   nickname: string;
+  password: string;
 };
