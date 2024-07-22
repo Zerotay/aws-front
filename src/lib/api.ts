@@ -19,14 +19,21 @@ export interface SearchBoardParams {
   page: number;
   size: number;
 }
+export interface SearchBoardResponse {
+  content: Board[];
+  totalPages: number;
+  totalElements: number;
+}
 
-const API_URL = process.env.BACKEND_URL;
+const API_URL = process.env.NEXT_PUBLIC_APP_URL;
 
 export const searchBoard = async (
   params: SearchBoardParams
-): Promise<Board[]> => {
+): Promise<SearchBoardResponse> => {
   const url = `board${makeQuerystring(params)}`;
   const response = await axios.get(`${API_URL}/${url}`);
+  console.log(response.data.content)
+  console.log(response.data)
   return response.data;
 };
 

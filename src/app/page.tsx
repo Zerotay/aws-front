@@ -1,27 +1,64 @@
+"use client"
 import Link from "next/link"
 import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext } from "@/components/ui/pagination"
 import { Board } from "@/types/Board"
+import { useRouter } from "next/router"
+import { useQueryClient, useSuspenseQuery, useMutation } from "@tanstack/react-query"
+import { useEffect,useState } from "react"
 
 import { siteConfig } from "@/config/site"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons"
 import { ModeToggle } from "@/components/mode-toggle"
+import { SORTBY, searchBoard , SearchBoardParams} from "@/lib/api"
 
-type Post = {
-  postId: number;
-  title: string;
-  content: string;
-  nickname: string;
-};
 
 const posts: Board[] = [
-  {title: "1", content: 'qwer', nickname: '123', boardId:1},
-  {title: "2", content: 'qwer', nickname: '123', boardId:2},
+  {title: "1", content: 'qwer', nickname: '123', boardId:1, password:'234'},
+  {title: "2", content: 'qwer', nickname: '123', boardId:2, password:'234'},
 ];
 
 
+const API_URL = process.env.BACKEND_URL;
+
+
 export default function Home() {
+  // const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const [page, setPage] = useState('1');
+  const [size, setSize] = useState(10);
+  const [sortby, setSortby] = useState<SORTBY>('LATEST');
+  const [boardList, setBoardList] = useState<Board[]>([]);
+  const [searchBoardParams, setSearchBoardParams] = useState<SearchBoardParams>({
+    sortBy: "LATEST",
+    page: 1,
+    size: 10,
+  });
+
+    useEffect(() => {
+    if (page) {
+      searchBoardParams.page = parseInt(page) - 1;
+      setSearchBoardParams(searchBoardParams);
+    }
+    window.scrollTo(0, 0); // 페이지 이동 시 스크롤 위치 맨 위로 초기화
+  }, [page]);
+
+  
+
+
+  const {data, isSuccess} = useSuspenseQuery({
+      queryKey: [searchBoardParams],
+      queryFn: context => {
+      return searchBoard(searchBoardParams);
+    }
+    ,
+  })
+  const pageclick =  () => {
+    // setPage()
+
+  }
   return (
     <main className="flex h-screen items-center justify-center">
   <section className="w-full py-12 md:py-24 lg:py-32">
@@ -36,7 +73,7 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-1 gap-6 py-12 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 lg:gap-8">
             <div className="grid grid-cols-1 gap-6 py-12 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 lg:gap-8">
-            {posts.map((post) => (
+            {data.content && data.content.map((post) => (
               <div key={post.boardId} className="group relative rounded-lg shadow-md">
                 <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
                   <span className="sr-only">View Post</span>
@@ -54,15 +91,11 @@ export default function Home() {
             <PaginationItem>
               <PaginationPrevious href="#" />
             </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#">1</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#">2</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#">3</PaginationLink>
-            </PaginationItem>
+            {data.totalPages && Array.from({length:data.totalPages}, (_,i)=>i+1).map((i) => (
+                  <PaginationItem>
+                    <PaginationLink href="#" onClick={pageclick}>{i}</PaginationLink>
+                  </PaginationItem>
+              ))}
             <PaginationItem>
               <PaginationNext href="#" />
             </PaginationItem>
@@ -70,25 +103,6 @@ export default function Home() {
         </Pagination>
       </div>
       </section>
-    {/*   <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center"> */}
-    {/*     <Icons.logo className="h-16 w-16" /> */}
-    {/*     <h1 className="text-4xl font-semibold sm:text-5xl md:text-6xl lg:text-7xl"> */}
-    {/*       {siteConfig.name} */}
-    {/*     </h1> */}
-    {/*     <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8"> */}
-    {/*       {siteConfig.description} */}
-    {/*     </p> */}
-    {/*     <div className="flex gap-2"> */}
-    {/*       <Link */}
-    {/*         href={siteConfig.links.github} */}
-    {/*         target="_blank" */}
-    {/*         className={cn(buttonVariants({ size: "default" }))} */}
-    {/*       > */}
-    {/*         Get Started */}
-    {/*       </Link> */}
-    {/*       <ModeToggle /> */}
-    {/*     </div> */}
-    {/*   </div> */}
      </main>
   )
 }
