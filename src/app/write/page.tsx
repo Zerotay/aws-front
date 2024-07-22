@@ -10,7 +10,7 @@ import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from "axios";
 
-const API_URL = process.env.BACKEND_URL;
+const API_URL = process.env.NEXT_PUBLIC_APP_URL;
 
 // export default function Component() 
 export default function InputForm(
@@ -28,7 +28,7 @@ export default function InputForm(
 
 // 데이터 ceraet하기 함수
 const createPost = async (createdPost:any) => {
-  const response = await axios.post(`/board`, createdPost);
+  const response = await axios.post(`${API_URL}/board`, createdPost);
   return response.data;
 };
 // 게시판 수정 페이지 컴포넌트
