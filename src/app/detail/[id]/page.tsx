@@ -2,58 +2,35 @@
 
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Separator} from "@/components/ui/separator";
-import {useMutation, useQueryClient, useSuspenseQueries} from "@tanstack/react-query";
+import {QueryClient, useMutation, useQueryClient, useSuspenseQueries} from "@tanstack/react-query";
 import {Button} from "@/components/ui/button";
 import {useRouter} from "next/navigation";
 import {Textarea} from "@/components/ui/textarea";
 import {AwaitedReactNode, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useState} from "react";
 import {Input} from "@/components/ui/input";
+import {createComment, deleteBoard, getBoard, getCommentList} from "@/lib/api";
+import {toast} from "@/components/ui/use-toast";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import {Label} from "@/components/ui/label";
 
 export default function Component({params}: { params: { id: number } }) {
     const boardId = params.id;
     const router = useRouter()
-
-    // 실제 구현해야 하는 데이터 부분
-    const getPostData = (boardId: number) => ({
-        title: "hello",
-        nickname: "허경영",
-        createdAt: "2023-12-12",
-        content: "conetns"
-    });
-
-    // 실제 구현해야 하는 데이터 부분
-    const getCommentList = (boardId: number) => [
-        {
-            title: "hello",
-            nickname: "허경영",
-            createdAt: "2023-12-12",
-            content: "content 1"
-        },
-        {
-            title: "world",
-            nickname: "홍길동",
-            createdAt: "2024-01-15",
-            content: "content 2"
-        },
-        {
-            title: "example",
-            nickname: "김철수",
-            createdAt: "2024-02-20",
-            content: "content 3"
-        }
-    ];
-
-    // 실제 구현해야 하는 파트
-    const deletePost = (param: number) => {
-        return Promise.resolve(undefined);
-    };
 
 
     const results = useSuspenseQueries({
         queries: [
             {
                 queryKey: ['Board', boardId],
-                queryFn: () => getPostData(boardId)
+                queryFn: () => getBoard(boardId)
             },
             {
                 queryKey: ['commentsList', boardId],
@@ -65,35 +42,47 @@ export default function Component({params}: { params: { id: number } }) {
     const [post, comments] = results.map((result: { data: any; }) => result.data);
 
     const handleEdit = () => router.push(`/modify/${boardId}`);
-    const handleDelete = () => null;
+    const handleDelete = () => {
+
+    };
     const handleBack = () => router.push("/");
 
     const [newContents, setNewContents] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [newNickName, setNewNickName] = useState("");
+    const [deletePassword, setDeletePassword] = useState("");
+
     const queryClient = useQueryClient();
 
     // 실제로 구현해야 하는 파트
     // 실제 댓글 API 파트
-    const writeComment = (param: any) => (param);
-
     const {mutate: CommentAdd} = useMutation({
-        mutationFn: (param: Object) => writeComment(param),
+        mutationFn: (param: Object) => createComment(boardId, param),
         onSuccess: (data, variables, context) => {
-            queryClient.invalidateQueries({queryKey: ['commentList', boardId]})
-            setNewContents('');
-        },
+            queryClient.invalidateQueries({
+                queryKey: ['commentsList', boardId],
+                type: "all"
+            })
+            setNewContents('')
+            setNewNickName((prevState) => "")
+            setNewPassword((prevState) => "")
+        }
     })
 
 
-    const {mutate} = useMutation({
-        mutationFn: (param: number) => deletePost(param),
+    const {mutate: boardDelete} = useMutation({
+        mutationFn: (param: string) => deleteBoard(boardId, {password: param}),
         onSuccess: (data, variables, context) => {
             queryClient.invalidateQueries({queryKey: ['board']});
             router.push(`/`);
         },
+        onError: (error, variables, context) => {
+            toast({
+                title: "게시글 삭제가 불가능합니다.",
+                description: "올바른 비밀번호를 입력하세요",
+            })
+        }
     })
-
 
     const handleCommentSubmit = () => {
         const newComment = {
@@ -122,16 +111,46 @@ export default function Component({params}: { params: { id: number } }) {
                         <div className="text-sm">{new Date(post.createdAt).toLocaleDateString()}</div>
                     </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 float-end">
                     <Button onClick={handleEdit}>Edit</Button>
-                    <Button variant="outline" onClick={handleDelete}>
-                        Delete
-                    </Button>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="outline">Delete</Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>게시글 삭제</DialogTitle>
+                                <DialogDescription>
+                                    게시글을 삭제하시기 위해 비밀번호를 입력해주세요.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="name" className="text-right">
+                                        비밀번호
+                                    </Label>
+                                    <Input
+                                        id="name"
+                                        type={"password"}
+                                        defaultValue=""
+                                        className="col-span-3"
+                                        onChange={event => setDeletePassword(event.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <Button
+                                    type="submit"
+                                    onClick={event => boardDelete(deletePassword)}
+                                >삭제하기</Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                     <Button variant="outline" onClick={handleBack}>
                         Back to List
                     </Button>
                 </div>
-                <p>{post.content}</p>
+                <div className={"mt-12"}> {post.content}</div>
                 <div className="mt-8 space-y-4">
                     <h2 className="text-2xl font-bold">Comments</h2>
                     <div className="space-y-4">
@@ -139,7 +158,8 @@ export default function Component({params}: { params: { id: number } }) {
                             id: Key | null | undefined;
                             nickname: string | null | undefined;
                             content: string | null | undefined;
-                            createdAt: string | null | undefined; }) => (
+                            createdAt: string | null | undefined;
+                        }) => (
                             <div key={comment.id} className="flex items-start gap-4">
                                 <Avatar>
                                     <AvatarImage src="/placeholder-user.jpg"/>
@@ -157,19 +177,22 @@ export default function Component({params}: { params: { id: number } }) {
                         ))}
                     </div>
                 </div>
-
-                <div className="flex gap-2">
-                    <div className="flex-1 space-y-2">
-                        <Input value={newNickName} onChange={(e) => setNewNickName(e.target.value)} placeholder="Nickname"/>
-                        <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Password"/>
+                <div className={"mt-6"}>
+                    <div className="flex gap-2">
+                        <div className="flex-2 space-y-3">
+                            <Input value={newNickName} onChange={(e) => setNewNickName(e.target.value)}
+                                   placeholder="Nickname"/>
+                            <Input type="password" value={newPassword}
+                                   onChange={(e) => setNewPassword(e.target.value)} placeholder="Password"/>
+                        </div>
+                        <Textarea
+                            value={newContents}
+                            onChange={(e) => setNewContents(e.target.value)}
+                            placeholder="Write your comment..."
+                            className="flex-1"
+                        />
+                        <Button onClick={handleCommentSubmit}>Submit</Button>
                     </div>
-                    <Textarea
-                        value={newContents}
-                        onChange={(e) => setNewContents(e.target.value)}
-                        placeholder="Write your comment..."
-                        className="flex-1"
-                    />
-                    <Button onClick={handleCommentSubmit}>Submit</Button>
                 </div>
             </article>
         </div>
