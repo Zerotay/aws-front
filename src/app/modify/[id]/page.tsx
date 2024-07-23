@@ -43,7 +43,6 @@ export default function InputForm({
 
     // 폼 제출 핸들러
     const handleSubmit = (event: any) => {
-        event.preventDefault();
         const updatedPost = {
             id: params.id,
             nickname: nickname,
@@ -59,7 +58,7 @@ export default function InputForm({
     }
 
     return (
-        <div className="flex justify-center">
+        <div className="flex h-screen items-center justify-center">
             <Card className="w-full max-w-2xl">
                 <CardHeader>
                     <CardTitle>{"게시물 수정"}</CardTitle>
@@ -67,15 +66,18 @@ export default function InputForm({
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="title">제목 *</Label>
-                        <Input id="title" type="text" placeholder="제목을 입력하세요" defaultValue={title} required/>
+                        <Input id="title" type="text" placeholder="제목을 입력하세요" defaultValue={title} required
+                               onChange={event => setTitle(event.target.value)}/>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="author">작성자명</Label>
-                        <Input id="author" type="text" placeholder="작성자명을 입력하세요" defaultValue={nickname}/>
+                        <Input id="author" type="text" placeholder="작성자명을 입력하세요" defaultValue={nickname}
+                               onChange={event => setNickname(event.target.value)}/>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="password">비밀번호</Label>
-                        <Input id="password" type="password" placeholder="비밀번호를 입력하세요" defaultValue={password}/>
+                        <Input id="password" type="password" placeholder="비밀번호를 입력하세요"
+                               onChange={event => setPassword(event.target.value)}/>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="content">내용</Label>
@@ -84,6 +86,7 @@ export default function InputForm({
                             placeholder="내용을 입력하세요"
                             className="min-h-[200px]"
                             defaultValue={content}
+                            onChange={event => setContent(event.target.value)}
                         />
                     </div>
                 </CardContent>
