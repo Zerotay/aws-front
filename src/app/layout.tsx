@@ -8,6 +8,7 @@ import {cn} from "@/lib/utils"
 import {ThemeProvider} from "@/components/theme-provider"
 import ReactQueryProvider from "@/components/provider/provider";
 import {Suspense} from "react";
+import {Toaster} from "@/components/ui/toaster";
 
 const inter = Inter({subsets: ["latin"]})
 
@@ -85,6 +86,7 @@ export default function RootLayout({children}: RootLayoutProps) {
                     disableTransitionOnChange
                 >
                     {children}
+                    <Toaster/>
                 </ThemeProvider>
             </Suspense>
         </ReactQueryProvider>
