@@ -8,6 +8,7 @@ import {useRouter} from "next/navigation";
 import {getBoard, updateBoard} from "@/lib/api"
 import {useEffect, useState} from "react"
 import {useMutation, useQuery, useQueryClient, useSuspenseQuery} from '@tanstack/react-query';
+import {toast} from "@/components/ui/use-toast";
 
 
 // export default function Component()
@@ -31,8 +32,9 @@ export default function InputForm({
             router.push(`/detail/${params.id}`);
         },
         onError: (data, variables, context) => {
-            console.log(data);
-
+            toast({
+                title: "게시글 등록에 실패하였습니다..",
+            })
         },
     });
 

@@ -26,7 +26,7 @@ export interface SearchBoardResponse {
   last: boolean;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_LOCAL_BACKED_URL;
+const API_URL = process.env.NEXT_PUBLIC_BACKED_URL;
 
 export const searchBoard = async (
   params: SearchBoardParams
@@ -41,6 +41,11 @@ export const searchBoard = async (
 
 export const getBoard = async (id: number): Promise<Board> => {
   const response = await axios.get(`${API_URL}/board/${id}`);
+  return response.data;
+};
+
+export const createPost = async (post: any): Promise<Board> => {
+  const response = await axios.post(`${API_URL}/board`, post);
   return response.data;
 };
 
