@@ -91,7 +91,7 @@ export default function Home() {
                     return (
                         <PaginationItem key={pageIndex}>
                           <PaginationLink href="#" onClick={() => handlePageChange(pageIndex)}
-                                          aria-disabled={pageIndex === page}>
+                                          isActive={pageIndex === page} aria-disabled={pageIndex === page}>
                             {pageIndex + 1}
                           </PaginationLink>
                         </PaginationItem>
