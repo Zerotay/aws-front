@@ -2,11 +2,11 @@
 
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Separator} from "@/components/ui/separator";
-import {QueryClient, useMutation, useQueryClient, useSuspenseQueries} from "@tanstack/react-query";
+import {useMutation, useQueryClient, useSuspenseQueries} from "@tanstack/react-query";
 import {Button} from "@/components/ui/button";
 import {useRouter} from "next/navigation";
 import {Textarea} from "@/components/ui/textarea";
-import React, {AwaitedReactNode, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useState} from "react";
+import React, {Key, useState} from "react";
 import {Input} from "@/components/ui/input";
 import {createComment, deleteBoard, getBoard, getCommentList} from "@/lib/api";
 import {toast} from "@/components/ui/use-toast";
