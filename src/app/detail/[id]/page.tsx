@@ -2,11 +2,11 @@
 
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Separator} from "@/components/ui/separator";
-import {QueryClient, useMutation, useQueryClient, useSuspenseQueries} from "@tanstack/react-query";
+import {useMutation, useQueryClient, useSuspenseQueries} from "@tanstack/react-query";
 import {Button} from "@/components/ui/button";
 import {useRouter} from "next/navigation";
 import {Textarea} from "@/components/ui/textarea";
-import {AwaitedReactNode, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useState} from "react";
+import React, {Key, useState} from "react";
 import {Input} from "@/components/ui/input";
 import {createComment, deleteBoard, getBoard, getCommentList} from "@/lib/api";
 import {toast} from "@/components/ui/use-toast";
@@ -42,10 +42,9 @@ export default function Component({params}: { params: { id: number } }) {
     const [post, comments] = results.map((result: { data: any; }) => result.data);
 
     const handleEdit = () => router.push(`/modify/${boardId}`);
-    const handleDelete = () => {
-
-    };
     const handleBack = () => router.push("/");
+    const handleDelete = () => boardDelete(deletePassword);
+
 
     const [newContents, setNewContents] = useState("");
     const [newPassword, setNewPassword] = useState("");
@@ -141,7 +140,7 @@ export default function Component({params}: { params: { id: number } }) {
                             <DialogFooter>
                                 <Button
                                     type="submit"
-                                    onClick={event => boardDelete(deletePassword)}
+                                    onClick={handleDelete}
                                 >삭제하기</Button>
                             </DialogFooter>
                         </DialogContent>
