@@ -1,25 +1,17 @@
 "use client"
 import Link from "next/link";
-import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext } from "@/components/ui/pagination";
-import { Board } from "@/types/Board";
-import { useQueryClient, useSuspenseQuery, useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { siteConfig } from "@/config/site";
-import { cn } from "@/lib/utils";
-import {Button, buttonVariants} from "@/components/ui/button";
-import { Icons } from "@/components/icons";
-import { ModeToggle } from "@/components/mode-toggle";
-import { SORTBY, searchBoard, SearchBoardParams } from "@/lib/api";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription, DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog";
-import {Label} from "@/components/ui/label";
-import {Input} from "@/components/ui/input";
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious
+} from "@/components/ui/pagination";
+import {useQueryClient, useSuspenseQuery} from "@tanstack/react-query";
+import {useState} from "react";
+import {Button} from "@/components/ui/button";
+import {searchBoard, SearchBoardParams, SORTBY} from "@/lib/api";
 import {useRouter} from "next/navigation";
 
 export default function Home() {
